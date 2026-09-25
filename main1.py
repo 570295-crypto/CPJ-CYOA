@@ -218,9 +218,9 @@ class Monster(Combatant):
             return True
 
 
-class Wizard_Spellbook(Combatant):
+class Elemental_Wizard(Combatant):
     def __init__(self):
-        super().__init__(50, 10, "Wizard Spellbook")
+        super().__init__(50, 10, "Elemental Wizard")
 
     def firebolt(self, target):
         damage = 10 * self.damage_multi
@@ -265,9 +265,9 @@ class Wizard_Spellbook(Combatant):
         return False
 
 
-class Wizard_staff(Combatant):
+class Alchemist(Combatant):
     def __init__(self):
-        super().__init__(75, 9, "Wizard Staff")
+        super().__init__(75, 9, "Alchemist")
 
     def chill_touch(self, target):
         if abs(target.pos - self.pos) > self.range:
@@ -310,9 +310,9 @@ class Wizard_staff(Combatant):
             return self.move(direction, amount)
         return False
 
-class Barbarian_Battleaxe(Combatant):
+class Berserker(Combatant):
     def __init__(self):
-        super().__init__(225, 3, "Barbarian Battleaxe")
+        super().__init__(225, 3, "Berserker")
 
     def slice(self, target):
         if abs(target.pos - self.pos) > self.range:
@@ -355,9 +355,9 @@ class Barbarian_Battleaxe(Combatant):
             return self.move(direction, amount)
         return False
 
-class Barbarian_Club(Combatant):
+class Giant(Combatant):
     def __init__(self):
-        super().__init__(200, 4, "Barbarian Club")
+        super().__init__(200, 4, " Giant")
 
     def clobber(self, target):
         if abs(target.pos - self.pos) > self.range:
@@ -398,9 +398,9 @@ class Barbarian_Club(Combatant):
             return self.move(direction, amount)
         return False
 
-class Paladin_Greatsword(Combatant):
+class Paladin(Combatant):
     def __init__(self):
-        super().__init__(150, 5, "Paladin Greatsword")
+        super().__init__(150, 5, "Paladin")
 
     def cleave(self, target):
         if abs(target.pos - self.pos) > self.range:
@@ -446,9 +446,9 @@ class Paladin_Greatsword(Combatant):
         return False
 
 
-class Paladin_Sword_and_Shield(Combatant):
+class Knight(Combatant):
     def __init__(self):
-        super().__init__(175, 6, "Paladin Sword and Shield")
+        super().__init__(175, 6, "Knight")
 
     def block(self):
         self.effects["Protection"] = 1
@@ -486,9 +486,9 @@ class Paladin_Sword_and_Shield(Combatant):
         return False
 
 
-class Rogue_Two_Daggers(Combatant):
+class Assassin(Combatant):
     def __init__(self):
-        super().__init__(100, 7, "Rogue Two Daggers")
+        super().__init__(100, 7, "Assassin")
         self.throwing_knives_success_chance = 0.7
         self.throwing_knives_damage = 4
         self.focused_damage_multi = 1.5
@@ -526,9 +526,9 @@ class Rogue_Two_Daggers(Combatant):
         return False
 
 
-class Rogue_Crossbow(Combatant):
+class Marksman(Combatant):
     def __init__(self):
-        super().__init__(125, 8, "Rogue Crossbow")
+        super().__init__(125, 8, "Marksman")
 
     def single_bolt(self, target):
         if abs(target.pos - self.pos) > self.range:
@@ -575,3 +575,20 @@ class Rogue_Crossbow(Combatant):
         if action == "move":
             return self.move(direction, amount)
         return False
+
+
+
+
+# test1 = Elemental_Wizard()
+# test2 = Monster(55, 4, 1, 5, 20, "Goblin", )
+# test3 = Combat(test1, test2)
+
+# test3.action("firebolt")
+# test3.action("firebolt")
+# test3.action("firebolt")
+# test3.action("firebolt")
+
+
+
+
+
