@@ -32,12 +32,14 @@ class Combat:
         previous_cd2 = active_entity.cd2
         active_entity.apply_effect()
 
+        print(f"It is {active_entity.name}'s turn. They have {active_entity.health} health remaining.")
+
         if active_entity.effects:
-            effect_list = ", ".join(f"{effect} ({duration} turn(s) left)" for effect, duration in active_entity.effects.items())
-            effects_text = f"They have the following effects: {effect_list}."
+            print("Current effects:")
+            for effect, duration in active_entity.effects.items():
+                print(f"{effect} effect active for the next {duration} turn(s)")
         else:
-            effects_text = "They have no active effects."
-        print(f"It is {active_entity.name}'s turn. {effects_text} They have {active_entity.health} health remaining.")
+            print("They have no active effects.")
 
         if active_entity.skipturn:
             print(f"{active_entity.name} is stunned and skips their turn.")
@@ -95,11 +97,11 @@ class Combatant:
             self.cd2 = max(0, self.cd2 - 1)
 
     def update_effects_after(self):
-        self.effects = {
-            effect: duration - 1
-            for effect, duration in self.effects.items()
-            if duration > 1
-        }
+        for effect, duration in list(self.effects.items()):
+            if duration > 1:
+                self.effects[effect] = duration - 1
+            else:
+                del self.effects[effect]
 
     def apply_effect(self):
         self.speed = self.base_speed
@@ -113,7 +115,7 @@ class Combatant:
                 self.speed = max(0, self.speed * 0.5)
             if effect == "Focused":
                 self.success_chance = 1
-                self.damage_multi *= getattr(self, "focused_damage_multi", 1.5)
+                self.damage_multi *= 1.5
             if effect == "Acidic":
                 self.damage_multi *= 0.7
             if effect == "Protection":
@@ -121,27 +123,23 @@ class Combatant:
             if effect == "Stunned":
                 self.skipturn = True
             if effect == "Dodge":
-                self.dodge_chance = getattr(self, "knife_dance_dodge_chance", 0.3)
+                self.dodge_chance = 0.3
 
-    def take_damage(self, amount, attacker=None):
-        if attacker is None:
-            hit_chance = 1.0 - self.dodge_chance
-        else:
-            hit_chance = max(0.0, attacker.success_chance - self.dodge_chance)
-
+    def take_damage(self, amount, attacker):
+        hit_chance = max(0.0, attacker.success_chance - self.dodge_chance)
         hit = random.random() <= hit_chance
 
-        reduced = 0
+        damage_taken = 0
         if hit:
-            reduced = round(amount * self.damage_taken_multi, 2)
-            self.health -= reduced
+            damage_taken = round(amount * self.damage_taken_multi, 2)
+            self.health -= damage_taken
 
-        if reduced > 0:
+        if damage_taken > 0:
             self.damage_taken_multi = 1.0
             if "Protection" in self.effects:
                 del self.effects["Protection"]
 
-        return reduced
+        return damage_taken
 
     def move(self, direction, amount):
         self.pos += direction * self.speed * amount
@@ -174,10 +172,7 @@ class Monster(Combatant):
         else:
             direction = -1
 
-        if direction == 1:
-            closest_pos = self.pos + self.speed
-        else:
-            closest_pos = self.pos - self.speed
+        closest_pos = self.pos + self.speed * direction
 
         if closest_pos > 40:
             closest_pos = 40
@@ -187,25 +182,15 @@ class Monster(Combatant):
         new_pos = closest_pos
 
         if self.range > target.range:
-            if direction == 1:
-                attack_position = target.pos - self.range
-                safe_position = target.pos - target.range - 1
-            else:
-                attack_position = target.pos + self.range
-                safe_position = target.pos + target.range + 1
+            attack_position = target.pos - direction * self.range
+            safe_position = target.pos - direction * (target.range + 1)
 
             if direction == 1:
                 preferred_position = max(attack_position, safe_position)
-                if closest_pos < preferred_position:
-                    new_pos = closest_pos
-                else:
-                    new_pos = preferred_position
+                new_pos = min(closest_pos, preferred_position)
             else:
                 preferred_position = min(attack_position, safe_position)
-                if closest_pos > preferred_position:
-                    new_pos = closest_pos
-                else:
-                    new_pos = preferred_position
+                new_pos = max(closest_pos, preferred_position)
 
             if new_pos > 40:
                 new_pos = 40
